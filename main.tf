@@ -51,7 +51,6 @@ resource "aws_subnet" "eng114_syed_terraform_private_subnet" {
 
 resource "aws_security_group" "app_security_group" {
   name        = "app-security_group"
-  description = "Allow port 80"
   vpc_id      = aws_vpc.eng114_syed_terraform_vpc.id
 
   ingress {
@@ -88,17 +87,53 @@ resource "aws_security_group" "app_security_group" {
   }
 }
 
-#resource "aws_instance" "app_instance"{
+# db security group
+
+resource "aws_security_group" "db_security_group" {
+  name        = "db-security_group"
+  vpc_id      = aws_vpc.eng114_syed_terraform_vpc.id
+
+  ingress {
+   from_port   = 22
+   to_port     = 22
+   protocol    = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+ }
+
+
+  ingress {
+   from_port   = 27017
+   to_port     = 27017
+   protocol    = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+ }
+
+
+  tags = {
+    Name = "eng114_syed_terraform_db_sg"
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+}
+
+
+
+resource "aws_instance" "app_instance"{
 # choose your ami and instance type
-#       ami = "ami-0b47105e3d7fc023e"
-#       instance_type = "t2.micro"
-#    subnet_id = "${aws_subnet.eng114_syed_terraform_public_subnet.id}"
+        ami = "ami-0b47105e3d7fc023e"
+        instance_type = "t2.micro"
+    subnet_id = "${aws_subnet.eng114_syed_terraform_public_subnet.id}"
 
 # enable a public ip
-#    associate_public_ip_address = true
-#
+    associate_public_ip_address = true
+
 # name the instance
-#    tags = {
-#        Name = "eng114_syed_"
-#    }
-#}
+    tags = {
+        Name = "eng114_syed_terraform_app"
+    }
+}
